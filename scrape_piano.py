@@ -1,13 +1,29 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
+from __future__ import print_function
+from datetime import datetime
+import os
+import pip
 
-driver = webdriver.Firefox()
-driver.get("https://www.pianolibrary.org/difficulty/")
-assert "Python" in driver.title
-elem = driver.find_element(By.NAME, "q")
-elem.clear()
-elem.send_keys("pycon")
-elem.send_keys(Keys.RETURN)
-assert "No results found." not in driver.page_source
-driver.close()
+
+if __name__ == "__main__":
+    packages = []
+    for package in pip.get_installed_distributions():
+        package_name_version = str(package)
+        try:
+            module_dir = next(package._get_metadata('top_level.txt'))
+            package_location = os.path.join(package.location, module_dir)
+            os.stat(package_location)
+        except (StopIteration, OSError):
+            try:
+                package_location = os.path.join(package.location, package.key)
+                os.stat(package_location)
+            except:
+                package_location = package.location
+        modification_time = os.path.getctime(package_location)
+        modification_time = datetime.fromtimestamp(modification_time)
+        packages.append([
+            modification_time,
+            package_name_version
+        ])
+    for modification_time, package_name_version in sorted(packages):
+        print("{0} - {1}".format(modification_time,
+                                 package_name_version))
