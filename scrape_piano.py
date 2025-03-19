@@ -8,7 +8,7 @@ def main():
     url = 'https://www.pianolibrary.org/difficulty/'
     difficulty = requests.get(url, timeout=10)
     soup = BeautifulSoup(difficulty.text, 'html.parser')
-    print(soup)
+    print(soup.body.contents)
 
 
 if __name__ == '__main__':
